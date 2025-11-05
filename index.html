@@ -1,1 +1,631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ковбойские Дуэли</title>
+    <style>
+        :root {
+            --primary-color: #000;
+            --secondary-color: #fff;
+            --accent-color: #e60012;
+            --background-color: #f5f5f5;
+            --card-color: #fff;
+            --text-color: #333;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23333"/><path d="M50,20 L60,40 L80,45 L65,60 L70,80 L50,70 L30,80 L35,60 L20,45 L40,40 Z" fill="%23e60012"/></svg>');
+            background-size: cover;
+            background-position: center;
+            color: var(--secondary-color);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            padding: 12px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #c4000f;
+            transform: translateY(-2px);
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .mode-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-card-header {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .mode-card-body {
+            padding: 20px;
+        }
+
+        .mode-card-body p {
+            margin-bottom: 15px;
+        }
+
+        .game-area {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background-color: var(--primary-color);
+            aspect-ratio: 16/9;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--secondary-color);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .countdown {
+            font-size: 120px;
+            color: var(--accent-color);
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .winner-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .winner-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: var(--border-radius);
+            margin: 20px auto;
+            display: block;
+            border: 5px solid var(--accent-color);
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .countdown {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Ковбойские <span>Дуэли</span></div>
+                <a href="#game" class="btn">Играть</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Кто быстрее?</h1>
+            <p>Сразитесь с другом в ковбойской дуэли с использованием отслеживания движений тела. Кто первым достанет пистолет?</p>
+            <a href="#game" class="btn">Начать дуэль</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Режимы игры</h2>
+            <div class="modes-grid">
+                <div class="mode-card">
+                    <div class="mode-card-header">Классическая дуэль</div>
+                    <div class="mode-card-body">
+                        <p>Поднимите руку на 90° первым, чтобы победить. Тот, кто сделает это быстрее, выигрывает раунд.</p>
+                        <a href="#game" class="btn" data-mode="classic">Выбрать</a>
+                    </div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-card-header">Дуэль до двух побед</div>
+                    <div class="mode-card-body">
+                        <p>Игра до двух побед. Нужно выиграть два раунда, чтобы стать победителем.</p>
+                        <a href="#game" class="btn" data-mode="best-of-three">Выбрать</a>
+                    </div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-card-header">Перезарядка</div>
+                    <div class="mode-card-body">
+                        <p>Поднимите руку на 90°, затем согните в локте и снова выпрямите. Кто первым выполнит полную последовательность?</p>
+                        <a href="#game" class="btn" data-mode="reload">Выбрать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="game" class="section">
+        <div class="container">
+            <h2 class="section-title">Арена дуэлей</h2>
+            <div class="game-area">
+                <div class="video-container">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="overlay" id="overlay">
+                        <div id="countdown" class="countdown">3</div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="start-btn" class="btn">Начать дуэль</button>
+                    <button id="reset-btn" class="btn">Сбросить</button>
+                </div>
+                <div id="results" class="results">
+                    <div class="winner-card">
+                        <h3>Победитель!</h3>
+                        <canvas id="winner-canvas" class="winner-image"></canvas>
+                        <p id="winner-text">Игрок 1 выиграл дуэль!</p>
+                        <button id="play-again-btn" class="btn">Играть еще раз</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Ковбойские Дуэли</div>
+                <div class="footer-links">
+                    <a href="#">Правила</a>
+                    <a href="#">О нас</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <p>&copy; 2023 Ковбойские Дуэли. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const video = document.getElementById('video');
+            const overlay = document.getElementById('overlay');
+            const countdownElement = document.getElementById('countdown');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const results = document.getElementById('results');
+            const winnerCanvas = document.getElementById('winner-canvas');
+            const winnerText = document.getElementById('winner-text');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const modeButtons = document.querySelectorAll('[data-mode]');
+            
+            let currentMode = 'classic';
+            let countdownInterval;
+            let isCountingDown = false;
+            let gameStarted = false;
+            let player1Score = 0;
+            let player2Score = 0;
+            
+            // Выбор режима игры
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentMode = this.getAttribute('data-mode');
+                    const modeName = this.closest('.mode-card').querySelector('.mode-card-header').textContent;
+                    alert(`Выбран режим: ${modeName}`);
+                    resetGame();
+                });
+            });
+            
+            // Начать дуэль
+            startBtn.addEventListener('click', function() {
+                if (!isCountingDown) {
+                    startCountdown();
+                }
+            });
+            
+            // Сбросить игру
+            resetBtn.addEventListener('click', function() {
+                resetGame();
+            });
+            
+            // Играть еще раз
+            playAgainBtn.addEventListener('click', function() {
+                resetGame();
+                startCountdown();
+            });
+            
+            // Запуск обратного отсчета
+            function startCountdown() {
+                isCountingDown = true;
+                overlay.style.display = 'flex';
+                let count = 3;
+                
+                // Воспроизведение звуковых сигналов
+                playBeep();
+                
+                countdownInterval = setInterval(function() {
+                    countdownElement.textContent = count;
+                    countdownElement.classList.add('pulse');
+                    
+                    setTimeout(() => {
+                        countdownElement.classList.remove('pulse');
+                    }, 500);
+                    
+                    if (count === 0) {
+                        clearInterval(countdownInterval);
+                        overlay.style.display = 'none';
+                        startGame();
+                        // Третий, самый громкий сигнал
+                        playBeep(true);
+                    } else {
+                        playBeep();
+                    }
+                    
+                    count--;
+                }, 1000);
+            }
+            
+            // Воспроизведение звукового сигнала
+            function playBeep(loud = false) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = loud ? 800 : 600;
+                gainNode.gain.value = loud ? 0.5 : 0.3;
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.2);
+            }
+            
+            // Начать игру
+            function startGame() {
+                gameStarted = true;
+                
+                // Здесь будет код для отслеживания движений тела
+                // В реальном приложении здесь будет использоваться TensorFlow.js или аналогичная библиотека
+                
+                // Симуляция определения победителя через случайное время
+                setTimeout(function() {
+                    determineWinner();
+                }, Math.random() * 2000 + 1000);
+            }
+            
+            // Определить победителя
+            function determineWinner() {
+                gameStarted = false;
+                
+                // Случайный выбор победителя для демонстрации
+                const winner = Math.random() > 0.5 ? 1 : 2;
+                
+                // Обновление счета в зависимости от режима
+                if (currentMode === 'classic') {
+                    // В классическом режиме достаточно одной победы
+                    showWinner(winner);
+                } else if (currentMode === 'best-of-three') {
+                    // В режиме до двух побед
+                    if (winner === 1) player1Score++;
+                    else player2Score++;
+                    
+                    if (player1Score >= 2 || player2Score >= 2) {
+                        const finalWinner = player1Score >= 2 ? 1 : 2;
+                        showWinner(finalWinner);
+                        player1Score = 0;
+                        player2Score = 0;
+                    } else {
+                        // Показываем промежуточный результат
+                        showIntermediateResult(winner);
+                    }
+                } else if (currentMode === 'reload') {
+                    // В режиме перезарядки
+                    showWinner(winner);
+                }
+            }
+            
+            // Показать победителя
+            function showWinner(winner) {
+                // Создание "фотографии" победителя
+                const ctx = winnerCanvas.getContext('2d');
+                winnerCanvas.width = 300;
+                winnerCanvas.height = 200;
+                
+                // Заполнение фона
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, 0, winnerCanvas.width, winnerCanvas.height);
+                
+                // Текст победителя
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Игрок ${winner}`, winnerCanvas.width / 2, winnerCanvas.height / 2);
+                
+                // Отображение результатов
+                winnerText.textContent = `Игрок ${winner} выиграл дуэль!`;
+                results.style.display = 'block';
+            }
+            
+            // Показать промежуточный результат
+            function showIntermediateResult(winner) {
+                // Создание "фотографии" победителя раунда
+                const ctx = winnerCanvas.getContext('2d');
+                winnerCanvas.width = 300;
+                winnerCanvas.height = 200;
+                
+                // Заполнение фона
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, 0, winnerCanvas.width, winnerCanvas.height);
+                
+                // Текст победителя раунда
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Игрок ${winner} выиграл раунд!`, winnerCanvas.width / 2, winnerCanvas.height / 2 - 20);
+                ctx.fillText(`Счет: ${player1Score}-${player2Score}`, winnerCanvas.width / 2, winnerCanvas.height / 2 + 20);
+                
+                // Отображение результатов
+                winnerText.textContent = `Игрок ${winner} выиграл раунд! Счет: ${player1Score}-${player2Score}`;
+                results.style.display = 'block';
+                
+                // Автоматически начинаем следующий раунд через 3 секунды
+                setTimeout(() => {
+                    results.style.display = 'none';
+                    startCountdown();
+                }, 3000);
+            }
+            
+            // Сброс игры
+            function resetGame() {
+                clearInterval(countdownInterval);
+                isCountingDown = false;
+                gameStarted = false;
+                overlay.style.display = 'none';
+                results.style.display = 'none';
+                countdownElement.textContent = '3';
+                player1Score = 0;
+                player2Score = 0;
+            }
+            
+            // Инициализация камеры
+            async function initCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'user',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        } 
+                    });
+                    video.srcObject = stream;
+                } catch (err) {
+                    console.error('Ошибка доступа к камере:', err);
+                    alert('Не удалось получить доступ к камере. Пожалуйста, проверьте разрешения.');
+                    
+                    // Заглушка для демонстрации, если камера недоступна
+                    video.style.backgroundColor = '#333';
+                    const ctx = winnerCanvas.getContext('2d');
+                    winnerCanvas.width = 300;
+                    winnerCanvas.height = 200;
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(0, 0, winnerCanvas.width, winnerCanvas.height);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Камера недоступна', winnerCanvas.width / 2, winnerCanvas.height / 2);
+                }
+            }
+            
+            // Инициализация при загрузке
+            initCamera();
+        });
+    </script>
+</body>
+</html>
