@@ -3,735 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Draw Tracker | Ковбойская Дуэль</title>
-    <!-- Загрузка Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Загрузка Font Awesome для иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Шрифты: Inter для чистого современного вида и Bold Serif для заголовка -->
+    <title>Cowboy Duel Arena</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Crete+Round:ital@0;1&family=Inter:wght@400;600;700;900&display=swap');
-        
-        /* Цветовая схема: Черный (Primary), Неоновый Желтый (Accent) */
-        :root {
-            --color-primary: #111827; /* Dark Grey/Black */
-            --color-accent: #fde047; /* Neon Yellow */
-            --color-text: #ffffff;
-            --color-error: #ef4444; /* Red */
-        }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-primary);
-            color: var(--color-text);
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"%3E%3Cpath fill="%23d4a373" fill-opacity="0.2" d="M0,96L48,101.3C96,107,192,117,288,138.7C384,160,480,192,576,181.3C672,171,768,117,864,101.3C960,85,1056,107,1152,138.7C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"%3E%3C/path%3E%3C/svg%3E');
+            background-size: cover;
         }
         h1 {
-            font-family: 'Crete Round', serif;
-            letter-spacing: 0.15em;
+            font-size: 3em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #b5651d;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
-        
-        /* Стилизация кнопок в "Nike стиле": жирные, с акцентом */
-        .modern-button {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: var(--color-accent);
-            color: var(--color-primary);
-            font-weight: 900;
-            border-radius: 0.75rem; /* Large rounded corners */
-            box-shadow: 0 10px 15px -3px rgba(253, 224, 71, 0.3), 0 4px 6px -2px rgba(253, 224, 71, 0.05);
+        #mode-select {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        .modern-button:hover {
-            box-shadow: 0 20px 25px -5px rgba(253, 224, 71, 0.5), 0 10px 10px -5px rgba(253, 224, 71, 0.04);
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #b5651d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: #8b4513;
             transform: translateY(-2px);
         }
-        .modern-button:disabled {
-            background-color: #4b5563; /* Grey out when disabled */
-            color: #d1d5db;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: translateY(0);
+        #video-container {
+            position: relative;
+            width: 80vw;
+            height: 60vh;
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
-
-        /* Видео контейнер */
-        #video-wrapper {
-            box-shadow: 0 0 40px rgba(253, 224, 71, 0.4);
-            border: 4px solid var(--color-accent);
+        #video {
+            width: 100%;
+            height: 100%;
         }
-        #video-canvas {
-            transform: scaleX(-1); /* Зеркальное отображение для фронтальной камеры */
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
-        
-        /* Оверлей таймера */
-        #countdown-overlay {
-            z-index: 50;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+        #timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            display: none;
+            z-index: 10;
         }
-        #countdown-text {
-            text-shadow: 0 0 20px var(--color-accent);
+        #winner-display {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #winner-img {
+            width: 300px;
+            height: auto;
+            border: 5px solid #b5651d;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        #play-again {
+            display: none;
+        }
+        .retro-font {
+            font-family: 'Courier New', monospace;
+        }
+        .gunfire {
+            position: absolute;
+            font-size: 3em;
+            color: #ffcc00;
+            animation: flash 0.3s ease-out;
+            pointer-events: none;
+            z-index: 20;
+        }
+        @keyframes flash {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.5); }
         }
     </style>
-    <!-- Загрузка Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // Включение логов для отладки
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        setLogLevel('debug');
-
-        // Глобальные переменные Canvas (обязательны для использования)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db, auth, userId;
-        window.firebaseInitialized = false;
-
-        // Обязательная функция инициализации Firebase
-        async function initFirebase() {
-            if (!firebaseConfig) {
-                console.error("Firebase Config не предоставлен.");
-                return;
-            }
-
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-            } catch(e) {
-                console.error("Ошибка инициализации Firebase:", e);
-                return;
-            }
-            
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Ошибка аутентификации Firebase:", error);
-            }
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    userId = user.uid;
-                    document.getElementById('user-id-display').textContent = `ID Пользователя: ${userId}`;
-                    window.firebaseInitialized = true;
-                    console.log("Firebase инициализирован. User ID:", userId);
-                    window.startGameLogic({ db, userId, appId });
-                } else {
-                    console.log("Пользователь не аутентифицирован.");
-                }
-            });
-        }
-
-        // Запуск инициализации при загрузке окна
-        window.addEventListener('load', initFirebase);
-    </script>
-
-    <!-- Загрузка MediaPipe Pose для отслеживания позы -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.1/control_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/pose.js"></script>
 </head>
 <body>
+    <h1 class="retro-font">Cowboy Duel Arena</h1>
+    <div id="mode-select">
+        <button onclick="startGame('duel')">Режим: Дуэль (Один выстрел)</button>
+        <button onclick="startGame('bestOfThree')">Режим: Лучший из 3</button>
+        <button onclick="startGame('reload')">Режим: С перезарядкой</button>
+    </div>
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        <div id="timer"></div>
+    </div>
+    <div id="winner-display">
+        <img id="winner-img" src="" alt="Победитель">
+        <p id="winner-text" class="retro-font"></p>
+    </div>
+    <button id="play-again" onclick="resetGame()">Играть ещё раз</button>
 
-<div id="game-container" class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-start">
+    <!-- Звуки -->
+    <audio id="beep1" src="https://www.soundjay.com/buttons/beep-07.mp3"></audio>
+    <audio id="beep2" src="https://www.soundjay.com/buttons/beep-07.mp3"></audio>
+    <audio id="beep3" src="https://www.soundjay.com/buttons/beep-08b.mp3"></audio>
+    <audio id="gunshot" src="https://www.soundjay.com/gun/sounds/gunshot-01.mp3"></audio>
+    <audio id="reload" src="https://www.soundjay.com/mechanical/sounds/reload-01.mp3"></audio>
+    <audio id="draw" src="https://www.soundjay.com/human/sounds/whoosh-01.mp3"></audio>
+    <audio id="win" src="https://www.soundjay.com/misc/sounds/bell-ringing-01.mp3"></audio>
 
-    <!-- Заголовок и ID пользователя -->
-    <header class="text-center mb-8 w-full max-w-4xl">
-        <h1 class="text-4xl md:text-6xl font-black text-white uppercase mt-4">
-            Quick Draw Tracker
-        </h1>
-        <p class="text-xs mt-2 text-gray-400" id="user-id-display">Ожидание аутентификации...</p>
-    </header>
+    <script>
+        // Элементы
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const timerElement = document.getElementById('timer');
+        const winnerDisplay = document.getElementById('winner-display');
+        const winnerImg = document.getElementById('winner-img');
+        const winnerText = document.getElementById('winner-text');
+        const playAgain = document.getElementById('play-again');
+        const modeSelect = document.getElementById('mode-select');
 
-    <!-- Игровое поле -->
-    <main class="w-full max-w-4xl flex flex-col items-center">
-        
-        <!-- Видео и Канвас Контейнер -->
-        <div id="video-wrapper" class="relative w-full aspect-[16/9] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
-            <video id="webcam-video" style="display: none;"></video>
-            <canvas id="video-canvas" class="w-full h-full object-cover"></canvas>
+        // Звуки
+        const beep1 = document.getElementById('beep1');
+        const beep2 = document.getElementById('beep2');
+        const beep3 = document.getElementById('beep3');
+        const gunshot = document.getElementById('gunshot');
+        const reload = document.getElementById('reload');
+        const draw = document.getElementById('draw');
+        const win = document.getElementById('win');
 
-            <!-- Оверлей для Таймера -->
-            <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center text-white text-9xl font-black hidden">
-                <span id="countdown-text" class="text-9xl font-extrabold" style="color: var(--color-accent);">3</span>
-            </div>
+        // Переменные игры
+        let currentMode = '';
+        let player1Score = 0;
+        let player2Score = 0;
+        let requiredWins = 1;
+        let pose = null;
+        let camera = null;
+        let gameStarted = false;
+        let countdownInterval = null;
+        let goTime = 0;
+        let player1State = 'waiting'; // waiting, drawn, reloaded
+        let player2State = 'waiting';
+        let lastFrameTime = 0;
 
-            <!-- Оверлей для Результатов -->
-            <div id="result-overlay" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.9);">
-                <h2 id="result-winner" class="text-5xl md:text-7xl mb-4 font-black tracking-wider animate-pulse" style="color: var(--color-accent);"></h2>
-                <p id="result-detail" class="text-lg md:text-2xl text-gray-300 mb-8 font-semibold"></p>
-                <!-- Кнопка "Играть ещё раз" -->
-                <button id="restart-game-btn" onclick="window.resetGame()" class="modern-button py-3 px-10 text-xl md:text-2xl w-full max-w-sm uppercase">
-                    Сыграть ещё раз
-                </button>
-            </div>
-        </div>
-        
-        <!-- Панель управления, Счёт и Режим -->
-        <div class="w-full mt-6 p-6 rounded-2xl bg-gray-800 shadow-xl">
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <!-- Счёт P1 -->
-                <div class="text-center p-4 rounded-xl bg-gray-900 shadow-inner border border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-300 flex items-center justify-center"><i class="fas fa-hand-point-right text-red-500 mr-2"></i> Игрок 1 (Правая)</h3>
-                    <p class="text-5xl font-extrabold mt-1" id="score-p1" style="color: var(--color-accent);">0</p>
-                    <span id="status-p1" class="text-sm block mt-2 font-semibold text-green-400">Готов</span>
-                </div>
-
-                <!-- Режим и Кнопка Start -->
-                <div class="flex flex-col justify-between space-y-4">
-                    <div class="text-center">
-                        <h3 class="text-sm font-semibold text-gray-400 uppercase">Режим Игры: <span id="game-mode-name" class="text-white"></span></h3>
-                        <select id="mode-selector" class="w-full p-3 bg-gray-900 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400 mt-2">
-                            <option value="single">Дуэль (Кто первый)</option>
-                            <option value="bestof3">Серия (До 3 побед)</option>
-                            <option value="reload">Перезарядка (Сложнее)</option>
-                        </select>
-                    </div>
-                    <button id="start-game-btn" onclick="window.prepareForDuel()" class="modern-button py-4 text-xl w-full uppercase">
-                        Начать Дуэль!
-                    </button>
-                </div>
-                
-                <!-- Счёт P2 -->
-                <div class="text-center p-4 rounded-xl bg-gray-900 shadow-inner border border-gray-700">
-                    <h3 class="text-xl font-bold text-gray-300 flex items-center justify-center"><i class="fas fa-hand-point-left text-blue-500 mr-2"></i> Игрок 2 (Левая)</h3>
-                    <p class="text-5xl font-extrabold mt-1" id="score-p2" style="color: var(--color-accent);">0</p>
-                    <span id="status-p2" class="text-sm block mt-2 font-semibold text-green-400">Готов</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Сообщения об ошибках / Статус -->
-        <div id="message-box" class="mt-4 w-full text-center p-3 rounded-lg bg-red-800/80 text-white font-bold hidden">
-            Требуется разрешить доступ к камере для начала игры.
-        </div>
-    </main>
-
-</div>
-
-<script>
-    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ИГРЫ ---
-    const GAME_STATES = {
-        SETUP: 'SETUP',
-        WAITING: 'WAITING',
-        COUNTDOWN: 'COUNTDOWN',
-        DRAW: 'DRAW',
-        RELOAD: 'RELOAD',
-        RESULT: 'RESULT'
-    };
-    
-    let gameState = GAME_STATES.SETUP;
-    let scores = { p1: 0, p2: 0 };
-    let duelStartTime = 0;
-    let mode = 'single';
-    let p1DrawnTime = 0;
-    let p2DrawnTime = 0;
-
-    const videoElement = document.getElementById('webcam-video');
-    const canvasElement = document.getElementById('video-canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    const countdownOverlay = document.getElementById('countdown-overlay');
-    const countdownText = document.getElementById('countdown-text');
-    const resultOverlay = document.getElementById('result-overlay');
-    const startButton = document.getElementById('start-game-btn');
-    const modeSelector = document.getElementById('mode-selector');
-    const messageBox = document.getElementById('message-box');
-    const modeNameDisplay = document.getElementById('game-mode-name');
-
-    // --- FIREBASE / PERSISTENCE (ОБЯЗАТЕЛЬНЫЙ ШАБЛОН) ---
-    let firestoreDB, currentUserId, currentAppId;
-
-    window.startGameLogic = ({ db, userId, appId }) => {
-        firestoreDB = db;
-        currentUserId = userId;
-        currentAppId = appId;
-        console.log("Логика игры запущена с Firebase.");
-        setupGamePersistence();
-        setupWebcam();
-    };
-    
-    // Путь к приватным данным: /artifacts/{appId}/users/{userId}/game_data
-    function getGameDocRef() {
-        if (!firestoreDB || !currentUserId || !currentAppId) return null;
-        // Используем doc() с явным путем для получения ссылки на документ
-        const path = `/artifacts/${currentAppId}/users/${currentUserId}/game_data/quickdraw_state`;
-        return firestoreDB.doc(path);
-    }
-
-    async function setupGamePersistence() {
-        const docRef = getGameDocRef();
-        if (!docRef) {
-            console.warn("Невозможно получить ссылку на документ Firestore.");
-            return;
-        }
-
-        try {
-            // 1. Загрузка/Инициализация состояния
-            const docSnap = await firestoreDB.getDoc(docRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                scores.p1 = data.p1Score || 0;
-                scores.p2 = data.p2Score || 0;
-                mode = data.mode || 'single';
-                modeSelector.value = mode;
-                updateUI();
-            } else {
-                // Установка начального состояния, если документа нет
-                await firestoreDB.setDoc(docRef, { p1Score: 0, p2Score: 0, mode: 'single' });
-            }
-            
-            // 2. Подписка на обновления в реальном времени
-            firestoreDB.onSnapshot(docRef, (doc) => {
-                if (doc.exists()) {
-                    const data = doc.data();
-                    scores.p1 = data.p1Score || 0;
-                    scores.p2 = data.p2Score || 0;
-                    
-                    const newMode = data.mode || 'single';
-                    if (mode !== newMode) {
-                        mode = newMode;
-                        modeSelector.value = mode;
-                    }
-                    updateUI();
-                }
-            });
-
-            // Слушатель для смены режима
-            modeSelector.addEventListener('change', (e) => {
-                mode = e.target.value;
-                scores.p1 = 0; // Сброс счета при смене режима
-                scores.p2 = 0;
-                saveGameState(); // Сохраняем новый режим и сброшенный счет
-                updateUI();
-            });
-
-        } catch (e) {
-            console.error("Ошибка при работе с Firestore:", e);
-        }
-    }
-
-    async function saveGameState() {
-        const docRef = getGameDocRef();
-        if (!docRef) return;
-        try {
-            await firestoreDB.setDoc(docRef, { p1Score: scores.p1, p2Score: scores.p2, mode: mode }, { merge: true });
-        } catch (e) {
-            console.error("Ошибка сохранения состояния игры:", e);
-        }
-    }
-
-    // --- MEDIA PIPE POSE И НАСТРОЙКА ВЕБ-КАМЕРЫ ---
-    let pose;
-    
-    function setupWebcam() {
-        if (!window.firebaseInitialized) {
-            setTimeout(setupWebcam, 50); // Ждем инициализации Firebase
-            return;
-        }
-        
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-                .then(stream => {
-                    videoElement.srcObject = stream;
-                    videoElement.play();
-                    videoElement.onloadedmetadata = () => {
-                        // Адаптивное управление размером canvas
-                        const aspectRatio = videoElement.videoWidth / videoElement.videoHeight;
-                        const wrapper = document.getElementById('video-wrapper');
-                        
-                        canvasElement.width = videoElement.videoWidth;
-                        canvasElement.height = videoElement.videoHeight;
-                        
-                        // Принудительная установка размера обертки для адаптивности
-                        wrapper.style.height = `${wrapper.offsetWidth / aspectRatio}px`;
-
-                        initializePose();
-                        gameState = GAME_STATES.WAITING;
-                        updateUI();
-                        messageBox.classList.add('hidden');
-                    };
-                })
-                .catch(error => {
-                    console.error("Не удалось получить доступ к камере:", error);
-                    messageBox.textContent = "Ошибка: Не удалось получить доступ к камере. Разрешите доступ и обновите страницу.";
-                    messageBox.classList.remove('hidden');
-                    startButton.disabled = true;
-                });
-        } else {
-            messageBox.textContent = "Ваш браузер не поддерживает MediaDevices API (веб-камеру).";
-            messageBox.classList.remove('hidden');
-            startButton.disabled = true;
-        }
-    }
-
-    function initializePose() {
-        pose = new Pose({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
-        }});
-
-        pose.setOptions({
-            modelComplexity: 1, 
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7
+        // Инициализация MediaPipe Pose
+        pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5/${file}`,
         });
-
+        pose.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            enableSegmentation: false,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
         pose.onResults(onResults);
 
-        // Запуск потока обработки
-        const camera = new Camera(videoElement, {
+        camera = new Camera(videoElement, {
             onFrame: async () => {
                 await pose.send({image: videoElement});
             },
-            width: 640,
-            height: 480
+            width: 1280,
+            height: 720
         });
-        camera.start();
-    }
 
-    // --- ЛОГИКА ОТСЛЕЖИВАНИЯ ПОЗЫ ---
-    
-    /**
-     * Вычисляет угол между тремя точками (A, B, C) в 2D пространстве.
-     */
-    function calculateAngle(A, B, C) {
-        const radians = Math.atan2(C.y - B.y, C.x - B.x) - Math.atan2(A.y - B.y, A.x - B.x);
-        let angle = Math.abs(radians * 180.0 / Math.PI);
-        if (angle > 180.0) {
-            angle = 360 - angle;
-        }
-        return angle;
-    }
+        async function startGame(mode) {
+            currentMode = mode;
+            player1Score = 0;
+            player2Score = 0;
+            player1State = 'waiting';
+            player2State = 'waiting';
 
-    /**
-     * Проверяет, "вытащен" ли пистолет (горизонтальная рука 90-180 градусов, выпрямленная).
-     */
-    function isDrawn(landmarks, shoulderIndex, elbowIndex, wristIndex) {
-        if (!landmarks[shoulderIndex] || !landmarks[elbowIndex] || !landmarks[wristIndex]) return false;
+            if (mode === 'bestOfThree') requiredWins = 2;
+            else if (mode === 'reload') requiredWins = 1;
+            else requiredWins = 1;
 
-        const shoulder = landmarks[shoulderIndex];
-        const elbow = landmarks[elbowIndex];
-        const wrist = landmarks[wristIndex];
+            modeSelect.style.display = 'none';
+            winnerDisplay.style.display = 'none';
+            playAgain.style.display = 'none';
 
-        // 1. Угол в локте (должен быть почти прямой, рука выпрямлена)
-        const elbowAngle = calculateAngle(shoulder, elbow, wrist);
-        const isStraight = elbowAngle > 165; // Допуск 165-180 градусов
-
-        // 2. Горизонтальное/Верхнее положение (запястье выше или на уровне плеча)
-        // Чем меньше Y, тем выше точка (MediaPipe: (0,0) в верхнем левом углу)
-        const isHigh = wrist.y < shoulder.y - 0.05; // Запястье заметно выше плеча
-        
-        return isStraight && isHigh;
-    }
-    
-    /**
-     * Проверяет, "перезаряжена" ли рука (опущена).
-     */
-    function isReloaded(landmarks, shoulderIndex, wristIndex) {
-        if (!landmarks[shoulderIndex] || !landmarks[wristIndex]) return false;
-
-        const shoulder = landmarks[shoulderIndex];
-        const wrist = landmarks[wristIndex];
-
-        // Проверка: запястье должно быть ниже плеча (чем больше Y, тем ниже)
-        const isLow = wrist.y > shoulder.y + 0.1; 
-        
-        return isLow;
-    }
-
-
-    // --- ГЛАВНЫЙ ЦИКЛ ОБРАБОТКИ РЕЗУЛЬТАТОВ POSE ---
-
-    function onResults(results) {
-        canvasCtx.save();
-        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        
-        // Рисуем видеопоток, зеркально отраженный, чтобы P1 был слева, P2 справа
-        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-
-        const landmarks = results.poseLandmarks;
-        
-        if (landmarks) {
-            
-            // Player 1 (P1) - Правая рука (Для игрока слева на экране)
-            const P1_SHOULDER = 12; 
-            const P1_ELBOW = 14;   
-            const P1_WRIST = 16;   
-
-            // Player 2 (P2) - Левая рука (Для игрока справа на экране)
-            const P2_SHOULDER = 11; 
-            const P2_ELBOW = 13;   
-            const P2_WRIST = 15;   
-            
-            // Рисуем все точки и соединения
-            drawConnectors(canvasCtx, landmarks, POSE_CONNECTIONS,
-                           {color: 'rgba(255, 255, 255, 0.4)', lineWidth: 2});
-            drawLandmarks(canvasCtx, landmarks,
-                          {color: '#fde047', lineWidth: 2, radius: 4});
-            
-            // Визуальная обратная связь для рук
-            if (landmarks[P1_WRIST]) {
-                const p1Ready = isReloaded(landmarks, P1_SHOULDER, P1_WRIST);
-                drawLandmarks(canvasCtx, [landmarks[P1_WRIST]], {
-                    color: p1Ready ? '#34d399' : '#fde047', // Зеленый, если рука опущена (готова), Желтый, если поднята/не готова
-                    fillColor: p1Ready ? '#059669' : '#b45309',
-                    radius: 8
-                });
-            }
-            if (landmarks[P2_WRIST]) {
-                const p2Ready = isReloaded(landmarks, P2_SHOULDER, P2_WRIST);
-                drawLandmarks(canvasCtx, [landmarks[P2_WRIST]], {
-                    color: p2Ready ? '#34d399' : '#fde047',
-                    fillColor: p2Ready ? '#059669' : '#b45309',
-                    radius: 8
-                });
-            }
-            
-            // --- ЛОГИКА ИГРЫ В РЕАЛЬНОМ ВРЕМЕНИ ---
-
-            if (gameState === GAME_STATES.DRAW) {
-                // 1. Проверка P1 (Правая рука)
-                if (p1DrawnTime === 0 && isDrawn(landmarks, P1_SHOULDER, P1_ELBOW, P1_WRIST)) {
-                    p1DrawnTime = performance.now();
-                }
-
-                // 2. Проверка P2 (Левая рука)
-                if (p2DrawnTime === 0 && isDrawn(landmarks, P2_SHOULDER, P2_ELBOW, P2_WRIST)) {
-                    p2DrawnTime = performance.now();
-                }
-
-                // 3. Определение победителя
-                if (p1DrawnTime > 0 || p2DrawnTime > 0) {
-                    determineWinner();
-                }
-            } else if (gameState === GAME_STATES.RELOAD) {
-                // Проверка, что руки опущены (перезаряжены)
-                const p1Reloaded = isReloaded(landmarks, P1_SHOULDER, P1_WRIST);
-                const p2Reloaded = isReloaded(landmarks, P2_SHOULDER, P2_WRIST);
-                
-                document.getElementById('status-p1').textContent = p1Reloaded ? 'Готов к дуэли' : 'Перезарядка...';
-                document.getElementById('status-p2').textContent = p2Reloaded ? 'Готов к дуэли' : 'Перезарядка...';
-
-                if (p1Reloaded && p2Reloaded) {
-                    // Оба перезаряжены, возвращаемся в WAITING для следующего раунда.
-                    gameState = GAME_STATES.WAITING;
-                    updateUI();
-                }
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                camera.start();
+                setTimeout(startCountdown, 1000);
+            } catch (err) {
+                alert("Не удалось получить доступ к камере. Проверьте разрешения.");
             }
         }
-        canvasCtx.restore();
-    }
 
-    // --- ЛОГИКА ИГРОВОГО ПРОЦЕССА ---
+        function startCountdown() {
+            gameStarted = true;
+            let count = 3;
+            timerElement.style.display = 'block';
+            timerElement.textContent = count;
 
-    // Воспроизведение звука (гудка)
-    function playBeep(frequency, duration, volume, callback) {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            // Воспроизведение звуков
+            const beeps = [beep1, beep2, beep3];
+            let beepIndex = 0;
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-
-            oscillator.start();
-            
-            setTimeout(() => {
-                // Плавное затухание
-                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
-                oscillator.stop();
-                if (callback) callback();
-            }, duration);
-        } catch (e) {
-            console.warn("AudioContext error, cannot play sound.", e);
-            if (callback) callback();
+            countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    timerElement.textContent = count;
+                    beeps[beepIndex].currentTime = 0;
+                    beeps[beepIndex].play();
+                    beepIndex++;
+                } else {
+                    timerElement.textContent = 'FIRE!';
+                    beep3.currentTime = 0;
+                    beep3.play();
+                    clearInterval(countdownInterval);
+                    goTime = Date.now();
+                    setTimeout(() => {
+                        timerElement.style.display = 'none';
+                    }, 800);
+                }
+            }, 1000);
         }
-    }
 
-    // Запуск таймера
-    window.prepareForDuel = () => {
-        if (gameState !== GAME_STATES.WAITING) return;
+        function onResults(results) {
+            if (!gameStarted || !results.poseLandmarks) return;
 
-        // Сброс временных меток
-        p1DrawnTime = 0;
-        p2DrawnTime = 0;
-        duelStartTime = 0;
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-        gameState = GAME_STATES.COUNTDOWN;
-        updateUI();
-        countdownOverlay.classList.remove('hidden');
-        
-        let count = 3;
-        
-        function tick() {
-            if (count > 0) {
-                countdownText.textContent = count;
-                const freq = count === 1 ? 800 : 550; // Последний гудок выше
-                const vol = count === 1 ? 0.7 : 0.4; // Последний гудок громче
-                playBeep(freq, 400, vol, () => {
-                    count--;
-                    if (count > 0) {
-                        setTimeout(tick, 1000);
-                    } else {
-                        // GO!
-                        countdownText.textContent = 'ОГОНЬ!';
-                        countdownText.style.color = 'var(--color-error)';
-                        playBeep(1200, 50, 0.9); // Короткий, резкий сигнал
-                        
-                        gameState = GAME_STATES.DRAW;
-                        duelStartTime = performance.now();
-                        updateUI();
-                        // Скрыть через 700мс
-                        setTimeout(() => {
-                            countdownOverlay.classList.add('hidden');
-                            countdownText.style.color = 'var(--color-accent)';
-                        }, 700);
+            // Рисуем скелет
+            drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
+            drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#FF0000', lineWidth: 2});
+            canvasCtx.restore();
+
+            // После "FIRE!"
+            if (goTime > 0 && Date.now() - goTime > 800) {
+                detectPlayers(results.poseLandmarks);
+            }
+        }
+
+        function detectPlayers(landmarks) {
+            const leftPlayer = [];
+            const rightPlayer = [];
+
+            landmarks.forEach(lm => {
+                if (lm.visibility > 0.5) {
+                    if (lm.x < 0.5) leftPlayer.push(lm);
+                    else rightPlayer.push(lm);
+                }
+            });
+
+            if (leftPlayer.length > 10) checkPlayerAction(leftPlayer, 1);
+            if (rightPlayer.length > 10) checkPlayerAction(rightPlayer, 2);
+        }
+
+        function checkPlayerAction(playerLandmarks, playerNum) {
+            const shoulder = playerLandmarks.find(lm => lm.name === 'right_shoulder') || 
+                           playerLandmarks[12];
+            const elbow = playerLandmarks.find(lm => lm.name === 'right_elbow') || 
+                         playerLandmarks[14];
+            const wrist = playerLandmarks.find(lm => lm.name === 'right_wrist') || 
+                         playerLandmarks[16];
+
+            if (!shoulder || !wrist) return;
+
+            const angle = Math.atan2(wrist.y - shoulder.y, wrist.x - shoulder.x) * 180 / Math.PI;
+            const isHorizontal = Math.abs(angle) < 25;
+
+            if (currentMode === 'reload') {
+                if (playerNum === 1 && player1State === 'waiting' && isHorizontal) {
+                    player1State = 'drawn';
+                    draw.currentTime = 0;
+                    draw.play();
+                    createGunfireEffect(shoulder.x * canvasElement.width, shoulder.y * canvasElement.height);
+                    setTimeout(() => checkReload(playerNum), 500);
+                }
+                if (playerNum === 2 && player2State === 'waiting' && isHorizontal) {
+                    player2State = 'drawn';
+                    draw.currentTime = 0;
+                    draw.play();
+                    createGunfireEffect(shoulder.x * canvasElement.width, shoulder.y * canvasElement.height);
+                    setTimeout(() => checkReload(playerNum), 500);
+                }
+            } else {
+                if ((playerNum === 1 && player1State === 'waiting') || 
+                    (playerNum === 2 && player2State === 'waiting')) {
+                    if (isHorizontal) {
+                        handleWin(playerNum);
                     }
-                });
+                }
             }
         }
-        tick();
-    };
 
-    function determineWinner() {
-        gameState = GAME_STATES.RESULT;
-        
-        let winner = null;
-        let p1Time = p1DrawnTime > 0 ? (p1DrawnTime - duelStartTime) / 1000 : Infinity;
-        let p2Time = p2DrawnTime > 0 ? (p2DrawnTime - duelStartTime) / 1000 : Infinity;
-        let winTime = 0;
-
-        if (p1Time < p2Time) {
-            winner = 1;
-            winTime = p1Time;
-        } else if (p2Time < p1Time) {
-            winner = 2;
-            winTime = p2Time;
-        } else if (p1DrawnTime > 0 && p2DrawnTime > 0) {
-            winner = 0; // Ничья
-        } else {
-            winner = 3; // Никто не победил (не должно случиться здесь)
+        function checkReload(playerNum) {
+            // Простая проверка: рука опустилась и поднялась
+            if ((playerNum === 1 && player1State === 'drawn') ||
+                (playerNum === 2 && player2State === 'drawn')) {
+                reload.currentTime = 0;
+                reload.play();
+                setTimeout(() => {
+                    if (playerNum === 1) player1State = 'reloaded';
+                    else player2State = 'reloaded';
+                    gunshot.currentTime = 0;
+                    gunshot.play();
+                    handleWin(playerNum);
+                }, 600);
+            }
         }
 
-        displayResult(winner, winTime);
-    }
-    
-    function displayResult(winner, time) {
-        const resultWinnerEl = document.getElementById('result-winner');
-        const resultDetailEl = document.getElementById('result-detail');
-        
-        if (winner === 1) {
-            resultWinnerEl.textContent = 'ИГРОК 1 ПОБЕЖДАЕТ!';
-            resultDetailEl.textContent = `Время реакции: ${time.toFixed(3)} сек.`;
-            scores.p1++;
-        } else if (winner === 2) {
-            resultWinnerEl.textContent = 'ИГРОК 2 ПОБЕЖДАЕТ!';
-            resultDetailEl.textContent = `Время реакции: ${time.toFixed(3)} сек.`;
-            scores.p2++;
-        } else if (winner === 0) {
-            resultWinnerEl.textContent = 'НИЧЬЯ!';
-            resultDetailEl.textContent = `Оба выстрелили одновременно!`;
-        } else {
-            resultWinnerEl.textContent = 'ПРОМАХ!';
-            resultDetailEl.textContent = `Попробуйте еще раз.`;
+        function createGunfireEffect(x, y) {
+            const flash = document.createElement('div');
+            flash.className = 'gunfire';
+            flash.textContent = 'BANG!';
+            flash.style.left = (x - 50) + 'px';
+            flash.style.top = (y - 50) + 'px';
+            document.getElementById('video-container').appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
         }
 
-        let isSeriesOver = false;
-        if (mode === 'bestof3' && (scores.p1 >= 3 || scores.p2 >= 3)) {
-            const seriesWinner = scores.p1 >= 3 ? 'Игрок 1' : 'Игрок 2';
-            resultWinnerEl.textContent = `ПОБЕДА В СЕРИИ: ${seriesWinner}!`;
-            resultDetailEl.textContent = `Финальный счет: ${scores.p1} - ${scores.p2}`;
-            isSeriesOver = true;
-        }
-        
-        resultOverlay.classList.remove('hidden');
-        saveGameState(); // Сохранение нового счета
-        updateUI(isSeriesOver);
-    }
-    
-    // Сброс для следующего раунда / новой игры
-    window.resetGame = () => {
-        resultOverlay.classList.add('hidden');
-        p1DrawnTime = 0;
-        p2DrawnTime = 0;
-        
-        const isSeriesOver = (mode === 'bestof3' && (scores.p1 >= 3 || scores.p2 >= 3));
+        function handleWin(player) {
+            gameStarted = false;
+            goTime = 0;
 
-        if (isSeriesOver) {
-             // Сброс счета, если серия окончена
-            scores.p1 = 0;
-            scores.p2 = 0;
-            saveGameState();
-            gameState = GAME_STATES.WAITING;
-        } else if (mode === 'reload') {
-            // Если режим "Перезарядка", требуется опустить руки
-            gameState = GAME_STATES.RELOAD;
-        } else {
-            // Обычный сброс
-            gameState = GAME_STATES.WAITING;
+            if (player === 1) player1Score++;
+            else player2Score++;
+
+            gunshot.currentTime = 0;
+            gunshot.play();
+
+            captureWinner(player);
+
+            setTimeout(() => {
+                if (player1Score >= requiredWins || player2Score >= requiredWins) {
+                    showFinalWinner(player1Score > player2Score ? 1 : 2);
+                } else {
+                    setTimeout(startCountdown, 1500);
+                }
+            }, 800);
         }
 
-        updateUI(isSeriesOver);
-    };
-    
-    // --- ОБНОВЛЕНИЕ UI ---
-
-    function updateUI(seriesOver = false) {
-        document.getElementById('score-p1').textContent = scores.p1;
-        document.getElementById('score-p2').textContent = scores.p2;
-        modeNameDisplay.textContent = modeSelector.options[modeSelector.selectedIndex].textContent;
-
-        const p1Status = document.getElementById('status-p1');
-        const p2Status = document.getElementById('status-p2');
-        
-        startButton.disabled = true; // По умолчанию отключаем
-
-        if (gameState === GAME_STATES.WAITING) {
-            startButton.disabled = false;
-            startButton.textContent = 'Начать Дуэль!';
-            p1Status.textContent = 'Готов';
-            p2Status.textContent = 'Готов';
-            p1Status.classList.remove('text-red-400');
-            p2Status.classList.remove('text-red-400');
-            p1Status.classList.add('text-green-400');
-            p2Status.classList.add('text-green-400');
-        } else if (gameState === GAME_STATES.RELOAD) {
-            startButton.textContent = 'Ожидание перезарядки...';
-            p1Status.textContent = 'ПЕРЕЗАРЯДИТЬ';
-            p2Status.textContent = 'ПЕРЕЗАРЯДИТЬ';
-            p1Status.classList.add('text-red-400');
-            p2Status.classList.add('text-red-400');
-            p1Status.classList.remove('text-green-400');
-            p2Status.classList.remove('text-green-400');
-        } else if (gameState === GAME_STATES.COUNTDOWN) {
-            startButton.textContent = 'ВНИМАНИЕ!';
-            p1Status.textContent = 'ВНИМАНИЕ';
-            p2Status.textContent = 'ВНИМАНИЕ';
-        } else if (gameState === GAME_STATES.DRAW) {
-            startButton.textContent = 'ОГОНЬ! ВЫСТРЕЛ!';
-            p1Status.textContent = 'ВЫСТРЕЛ!';
-            p2Status.textContent = 'ВЫСТРЕЛ!';
-        } else if (gameState === GAME_STATES.RESULT) {
-            startButton.textContent = 'Результаты...';
-            p1Status.textContent = 'СТОП';
-            p2Status.textContent = 'СТОП';
-            
-            document.getElementById('restart-game-btn').textContent = seriesOver ? 'Начать новую серию' : 'Сыграть ещё раз';
+        function captureWinner(player) {
+            const cropX = player === 1 ? 0 : canvasElement.width / 2;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvasElement.width / 2;
+            tempCanvas.height = canvasElement.height;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.drawImage(videoElement, cropX, 0, tempCanvas.width, tempCanvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+            winnerImg.src = tempCanvas.toDataURL('image/png');
         }
-    }
-</script>
 
+        function showFinalWinner(player) {
+            winnerText.textContent = `ПОБЕДИТЕЛЬ: ИГРОК ${player}!`;
+            winnerDisplay.style.display = 'flex';
+            playAgain.style.display = 'block';
+            win.currentTime = 0;
+            win.play();
+        }
+
+        function resetGame() {
+            player1Score = 0;
+            player2Score = 0;
+            player1State = 'waiting';
+            player2State = 'waiting';
+            winnerDisplay.style.display = 'none';
+            playAgain.style.display = 'none';
+            modeSelect.style.display = 'flex';
+            timerElement.style.display = 'none';
+            gameStarted = false;
+            goTime = 0;
+            camera.stop();
+        }
+
+        // Авто-ресайз
+        window.addEventListener('resize', () => {
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+        });
+    </script>
 </body>
 </html>
-
